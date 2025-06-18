@@ -2,7 +2,7 @@ name: ci
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
 
 env:
   ACR_NAME: posacrfa01
@@ -37,7 +37,8 @@ jobs:
       - uses: azure/aks-set-context@v3
         with:
           resource-group: ${{ env.RG }}
-          cluster-name:  ${{ env.CLUSTER }}
+          cluster-name: ${{ env.CLUSTER }}
+          admin: "true"
 
       - name: Deploy
         run: |
