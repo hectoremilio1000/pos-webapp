@@ -3,4 +3,16 @@ image:
   tag: '{{ .Env.IMAGE_TAG | default "dev" }}'
 
 service:
-  port: 3000
+  port: 80 # ya lo tienes bien
+
+livenessProbe:
+  path: /
+  port: 80
+  initialDelaySeconds: 10
+  periodSeconds: 10
+
+readinessProbe:
+  path: /
+  port: 80
+  initialDelaySeconds: 10
+  periodSeconds: 10
