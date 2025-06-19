@@ -4,14 +4,14 @@ on:
   push:
     branches: [main]
     paths:
-      - 'src/**'
-      - 'Dockerfile'
-      - '.github/workflows/cd.yml'
-      - 'helm/**'
+      - "src/**"
+      - "Dockerfile"
+      - ".github/workflows/cd.yml"
+      - "helm/**"
 
 env:
-  ACR: posacr.azurecr.io           # ⚠️ igual al de arriba
-  RG:  myTFResourceGroup
+  ACR: posacrfa01.azurecr.io # ⚠️ igual al de arriba
+  RG: myTFResourceGroup
   CLUSTER: pos-aks
 
 jobs:
@@ -34,15 +34,15 @@ jobs:
       - name: Build & push image
         run: |
           TAG=${{ github.sha }}
-          docker build -t $ACR/pos-webapp:$TAG .
-          docker push   $ACR/pos-webapp:$TAG
+          docker build -t ${ACR}/pos-webapp:${TAG} .
+          docker push   ${ACR}/pos-webapp:${TAG}
           echo "IMAGE_TAG=$TAG" >> $GITHUB_ENV
 
       - name: Set AKS context
         uses: azure/aks-set-context@v3
         with:
           resource-group: ${{ env.RG }}
-          cluster-name:  ${{ env.CLUSTER }}
+          cluster-name: ${{ env.CLUSTER }}
           admin: true
 
       - name: Helm upgrade
