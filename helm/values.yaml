@@ -1,0 +1,6 @@
+image:
+  repository: posacr.azurecr.io/pos-webapp
+  tag: "{{ .Env.IMAGE_TAG | default \"dev\" }}"
+
+service:
+  port: 3000

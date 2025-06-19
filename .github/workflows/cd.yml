@@ -1,0 +1,53 @@
+name: cd
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'Dockerfile'
+      - '.github/workflows/cd.yml'
+      - 'helm/**'
+
+env:
+  ACR: posacr.azurecr.io           # ⚠️ igual al de arriba
+  RG:  myTFResourceGroup
+  CLUSTER: pos-aks
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Docker login to ACR
+        uses: azure/docker-login@v1
+        with:
+          login-server: ${{ env.ACR }}
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
+
+      - name: Build & push image
+        run: |
+          TAG=${{ github.sha }}
+          docker build -t $ACR/pos-webapp:$TAG .
+          docker push   $ACR/pos-webapp:$TAG
+          echo "IMAGE_TAG=$TAG" >> $GITHUB_ENV
+
+      - name: Set AKS context
+        uses: azure/aks-set-context@v3
+        with:
+          resource-group: ${{ env.RG }}
+          cluster-name:  ${{ env.CLUSTER }}
+          admin: true
+
+      - name: Helm upgrade
+        run: |
+          helm upgrade --install pos-webapp ../pos-infra/charts/base \
+            --values helm/values.yaml \
+            --set image.tag=${{ env.IMAGE_TAG }} \
+            --namespace default --create-namespace
