@@ -1,4 +1,7 @@
 FROM nginx:1.25-alpine
-RUN echo '<h1>Hello from AKS 🚀</h1>' > /usr/share/nginx/html/index.html
+
+# Copia todo el contenido de src/ al directorio público de Nginx
+COPY src/ /usr/share/nginx/html/
+
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
